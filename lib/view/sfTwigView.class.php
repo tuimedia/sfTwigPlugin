@@ -44,6 +44,8 @@ class sfTwigView extends sfPHPView
         
         //Setting the $loader to null lets us swap the loader out as we need it on the same instance.
         $this->twig = new Twig_Environment(null);
+        
+        $this->loadCoreAndStandardExtensions();
     }
     
     /**
@@ -80,6 +82,24 @@ class sfTwigView extends sfPHPView
     public function getEngine()
     {
         return $this->twig;
+    }
+    
+    /**
+     * Loads the standard extensions for Symfony based on the Standard helpers
+     * but only if the ExtensionName_Twig_Extension class exists
+     *
+     * @return void
+     */
+    protected function loadCoreAndStandardExtensions()
+    {
+        $extensionPrefixes = array_unique(array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping'), sfConfig::get('sf_standard_helpers')));
+        
+        foreach ($extensionPrefixes as $extensionPrefix) {
+            $className = sprintf('%s_Twig_Extension', $extensionPrefix);
+            if (class_exists($className)) {
+                $this->twig->addExtension(new $className());
+            }
+        }
     }
     
     /**
