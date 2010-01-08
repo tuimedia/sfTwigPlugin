@@ -8,132 +8,94 @@
  * file that was distributed with this source code.
  */
 
-
 /**
- * A view that uses PHP as the templating engine.
+ * A view that uses Twig as the templating engine.
  *
  * @package    symfony
  * @subpackage sfTwigPlugin
- * @author     Henrik Bjornskov <yep@iamhenrik.se>
+ * @author     Henrik Bjornskov <henrik@bearwoods.dk>
  */
 class sfTwigView extends sfPHPView
 {
     protected
-        $twig           = null,
-        $twig_loaders   = array('decorator' => null, 'module' => null),
-        $extension      = '.html';
-    
-    /**
-     * Initializes this view.
-     *
-     * @param  sfContext $context     The current application context
-     * @param  string    $moduleName  The module name for this view
-     * @param  string    $actionName  The action name for this view
-     * @param  string    $viewName    The view name
-     * @return bool  true, if initialization completes successfully, otherwise false
-     */
-    public function initialize($context, $moduleName, $actionName, $viewName)
-    {
-        parent::initialize($context, $moduleName, $actionName, $viewName);
-
-        $config = $context->getConfiguration();
-
-        //sets up a Twig_Loader_Array with directories
-        $this->twig_loaders['decorator'] = new Twig_Loader_FileSystem(array_filter($config->getDecoratorDirs(), 'file_exists'), sfConfig::get('sf_template_cache_dir'));
-        $this->twig_loaders['module']    = new Twig_Loader_FileSystem(array_filter($config->getTemplateDirs($this->getModuleName()), 'file_exists'), sfConfig::get('sf_template_cache_dir'));
-
-        //Setting the $loader to null lets us swap the loader out as we need it on the same instance.
-        $this->twig = new Twig_Environment(null);
-
-        $this->loadCoreAndStandardExtensions();
-    }
-    
-    /**
-     * Renders the content
-     *
-     * @return string
-     */
-    public function render()
-    {
-        //Content holder
-        $content = null;
+        $twig = null,
+        $loader = null,
+        $configuration = null,
+        $dirs = array(
+            'decorator' => array(),
+            'module' => array(),
+        );
         
-        //No cache
-        if (is_null($content)) {
-            // execute pre-render check
-            $this->preRenderCheck();
-            
-            $content = $this->renderTemplate('module');
-        }
-        
-        //Two step rendering so decorate if needed
-        if ($this->isDecorator()) {
-            $content = $this->renderTemplate('decorator', $content);
-        }
-    
-        return $content;
-    }
-    
     /**
-     * Returns the initiated Twig_Environment object
-     *
-     * @return Twig_Environment
-     */
-    public function getEngine()
-    {
-        return $this->twig;
-    }
-    
-    /**
-     * Loads the standard extensions for Symfony based on the Standard helpers
-     * but only if the ExtensionName_Twig_Extension class exists
+     * Loads the Twig instance and registers the autoloader.
      *
      * @return void
      */
-    protected function loadCoreAndStandardExtensions()
+    public function configure()
     {
-        $extensionPrefixes = array_unique(array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping'), sfConfig::get('sf_standard_helpers')));
+        parent::configure();
         
-        foreach ($extensionPrefixes as $extensionPrefix) {
-            $className = sprintf('%s_Twig_Extension', $extensionPrefix);
-            if (class_exists($className)) {
-                $this->twig->addExtension(new $className());
+        $this->configuration = $this->context->getConfiguration();
+        
+        //Empty array becuase it changes based on the rendering context
+        $this->loader = new Twig_Loader_Filesystem(array());
+        
+        $this->twig = new Twig_Environment($this->loader, array(
+            'auto_reload' => sfConfig::get('sf_debug', false),
+            'cache' => sfConfig::get('sf_template_cache_dir'),
+            'debug' => sfConfig::get('sf_debug', false),
+        ));        
+    }
+    
+    /**
+     * Loads standard extensions for Symfony into the view, the extensions should be replaced
+     * with real Twig extensions where tags and filters are determained.
+     *
+     * @return void
+     */
+    protected function loadExtensions()
+    {
+        //Should be replaced with sf_twig_standard_extensions
+        $prefixes = array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping',), sfConfig::get('sf_standard_helpers'));
+        
+        foreach ($prefixes as $prefix) {
+            $class_name = $prefix . '_Twig_Extension';
+            if (class_exists($class_name)) {
+                $this->twig->addExtension(new $class_name());
             }
         }
     }
     
     /**
-     * Renders a Twig_Template based on $loader_type
+     * This renders a file based on the $file and sf_type
      *
-     * @param string $loader_type this can be decorator or module
-     * @param string $content Content to be decorated if the $loader_type is decorator
-     * @returns string a rendered Twig_Template
+     * @param string $file the fullpath to the template file
+     * @return string
      */
-    protected function renderTemplate($loader_type, $content = null)
+    protected function renderFile($file)
     {
-        //Must be availible even tho Twig cant support calling them
-        $this->loadCoreAndStandardHelpers();
-        
-        switch ($loader_type) {
-            case 'decorator':
-                $attributeHolder = clone $this->attributeHolder;
-                $this->attributeHolder = $this->initializeAttributeHolder(array('sf_content' => new sfOutputEscaperSafe($content)));
-                $this->attributeHolder->set('sf_type', 'layout');
-                
-                $this->twig->setLoader($this->twig_loaders['decorator']);
-                $content = $this->twig->loadTemplate($this->getDecoratorTemplate())->render($this->attributeHolder->toArray());
-                
-                $this->attributeHolder = $attributeHolder;
-                unset($attributeHolder);
-                break;
-            case 'module':
-            default:
-                $this->attributeHolder->set('sf_type', 'action');
-                $this->twig->setLoader($this->twig_loaders['module']);
-                $content = $this->twig->loadTemplate($this->getTemplate())->render($this->attributeHolder->toArray());
-                break;
+        if (sfConfig::get('sf_logging_enabled', false)) {
+            $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s".', $file))));
         }
         
-        return $content;
+        if ($this->attributeHolder->get('sf_type') == 'layout') {
+            $this->loader->setPaths(array_filter($this->configuration->getDecoratorDirs(), 'file_exists'));
+        } else {
+            $this->loader->setPaths(array_filter($this->configuration->getTemplateDirs($this->getModuleName()), 'file_exists'));
+        }
+        
+        return $this->twig->loadTemplate(basename($file))->render($this->attributeHolder->getAll());
+    }
+    
+    /**
+     * Returns the extension for the templates, uses HTML so editors
+     * will provided syntax highlighting. For nice syntax highlight get the
+     * syntax for django html.
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return '.html';
     }
 }
