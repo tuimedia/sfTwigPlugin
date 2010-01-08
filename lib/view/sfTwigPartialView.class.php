@@ -18,4 +18,18 @@
  */
 class sfTwigPartialView extends sfTwigView
 {
+    protected
+        $partialVars = array();
+    
+    /**
+     * Method used by symfony to force add the extra variables when rendering a partial
+     *
+     * @param array $variables
+     * @return void
+     */
+    public function setPartialVars(array $variables)
+    {
+        $this->partialVars = $variables;
+        $this->getAttributeHolder()->add($variables);
+    }
 }

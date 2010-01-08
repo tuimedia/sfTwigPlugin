@@ -62,6 +62,9 @@ class sfTwigView extends sfPHPView
                 $this->twig->addExtension(new $class_name());
             }
         }
+        
+        //for now the extensions needs the original helpers so lets load thoose.
+        $this->configuration->loadHelpers($prefixes);
     }
     
     /**
