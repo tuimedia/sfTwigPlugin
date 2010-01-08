@@ -1,18 +1,17 @@
 <?php
-
-class I18N_Twig_Extension extends Twig_Extension
+class I18n_Twig_Extension extends Twig_Extension
 {
   public function getFilters()
   {
     return array(
-              "format_number_choice" => array("format_number_choice", false),
-              "format_country" => array("format_country", false),
-              "format_language" => array("format_language", false),
+              'format_number_choice' => new Twig_Filter_Function('format_number_choice'),
+              'format_country' => new Twig_Filter_Function('format_country'),
+              'format_language' => new Twig_Filter_Function('format_language'),
             );
   }
 
   public function getName()
   {
-    return "i18n";
+    return 'i18n';
   }
 }

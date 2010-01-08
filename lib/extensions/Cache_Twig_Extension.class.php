@@ -1,17 +1,16 @@
 <?php
-
 class Cache_Twig_Extension extends Twig_Extension
 {
   public function getFilters()
   {
     return array(
-              "cache" => array("cache", false),
-              "cache_save" => array("cache_save", false),
+              'cache' => new Twig_Filter_Function('cache'),
+              'cache_save' => new Twig_Filter_Function('cache_save'),
             );
   }
 
   public function getName()
   {
-    return "cache";
+    return 'cache';
   }
 }

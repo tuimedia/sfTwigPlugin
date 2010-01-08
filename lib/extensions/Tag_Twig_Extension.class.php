@@ -1,23 +1,22 @@
 <?php
-
 class Tag_Twig_Extension extends Twig_Extension
 {
   public function getFilters()
   {
     return array(
-              "tag" => array("tag", false),
-              "content_tag" => array("content_tag", false),
-              "cdata_section" => array("cdata_section", false),
-              "comment_as_conditional" => array("comment_as_conditional", false),
-              "escape_javascript" => array("escape_javascript", false),
-              "escape_once" => array("escape_once", false),
-              "fix_double_escape" => array("fix_double_escape", false),
-              "get_id_from_name" => array("get_id_from_name", false),
+              'tag' => new Twig_Filter_Function('tag'),
+              'content_tag' => new Twig_Filter_Function('content_tag'),
+              'cdata_section' => new Twig_Filter_Function('cdata_section'),
+              'comment_as_conditional' => new Twig_Filter_Function('comment_as_conditional'),
+              'escape_javascript' => new Twig_Filter_Function('escape_javascript'),
+              'escape_once' => new Twig_Filter_Function('escape_once'),
+              'fix_double_escape' => new Twig_Filter_Function('fix_double_escape'),
+              'get_id_from_name' => new Twig_Filter_Function('get_id_from_name'),
             );
   }
 
   public function getName()
   {
-    return "tag";
+    return 'tag';
   }
 }

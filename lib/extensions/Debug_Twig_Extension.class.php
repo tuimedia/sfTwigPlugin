@@ -1,17 +1,15 @@
 <?php
-
 class Debug_Twig_Extension extends Twig_Extension
 {
   public function getFilters()
   {
     return array(
-              "debug_message" => array("debug_message", false),
-              "log_message" => array("log_message", false),
+              'log_message' => new Twig_Filter_Function('log_message'),
             );
   }
 
   public function getName()
   {
-    return "debug";
+    return 'debug';
   }
 }
