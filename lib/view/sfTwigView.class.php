@@ -20,11 +20,7 @@ class sfTwigView extends sfPHPView
     protected
         $twig = null,
         $loader = null,
-        $configuration = null,
-        $dirs = array(
-            'decorator' => array(),
-            'module' => array(),
-        );
+        $configuration = null;
         
     /**
      * Loads the Twig instance and registers the autoloader.
@@ -44,7 +40,9 @@ class sfTwigView extends sfPHPView
             'auto_reload' => sfConfig::get('sf_debug', false),
             'cache' => sfConfig::get('sf_template_cache_dir'),
             'debug' => sfConfig::get('sf_debug', false),
-        ));        
+        )); 
+        
+        $this->loadExtensions();       
     }
     
     /**
@@ -56,7 +54,7 @@ class sfTwigView extends sfPHPView
     protected function loadExtensions()
     {
         //Should be replaced with sf_twig_standard_extensions
-        $prefixes = array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping',), sfConfig::get('sf_standard_helpers'));
+        $prefixes = array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping', 'Partial'), sfConfig::get('sf_standard_helpers'));
         
         foreach ($prefixes as $prefix) {
             $class_name = $prefix . '_Twig_Extension';
