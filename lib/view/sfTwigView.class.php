@@ -17,10 +17,20 @@
  */
 class sfTwigView extends sfPHPView
 {
-    protected
-        $twig = null,
-        $loader = null,
-        $configuration = null;
+    /**
+     * @var Twig_Environment
+     */
+    protected $twig = null;
+    
+    /**
+     * @var Twig_Loader_Filesystem
+     */
+    protected $loader = null;
+    
+    /**
+     * @var sfApplicationConfiguration
+     */
+    protected $configuration = null;
         
     /**
      * Loads the Twig instance and registers the autoloader.
@@ -43,6 +53,19 @@ class sfTwigView extends sfPHPView
         )); 
         
         $this->loadExtensions();       
+    }
+    
+    /**
+     * Returns the attributeHolders variables merged with some default ones. Since
+     * sfPHPView normally has a $this context we fake it here.
+     *
+     * @return array
+     */
+    protected function getAttributeHolderVariables()
+    {
+        return sfToolKit::arrayDeepMerge($this->attributeHolder->getAll(), array(
+            'this' => $this,
+        ));
     }
     
     /**
@@ -85,7 +108,7 @@ class sfTwigView extends sfPHPView
             $this->loader->setPaths(array_filter($this->configuration->getTemplateDirs($this->getModuleName()), 'file_exists'));
         }
         
-        return $this->twig->loadTemplate(basename($file))->render($this->attributeHolder->getAll());
+        return $this->twig->loadTemplate(basename($file))->render($this->getAttributeHolderVariables());
     }
     
     /**
