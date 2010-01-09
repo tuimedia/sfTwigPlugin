@@ -6,7 +6,7 @@ Contributors
 ------------
 At this time this information is taken from the Github network graph. Feel free to add your own name if you have provided something to this project.
 
-* [Henrik Bjørnskov](http://blog.bearwoods.dk) (henrikbjorn)
+* [Henrik Bj√∏rnskov](http://blog.bearwoods.dk) (henrikbjorn)
 * videlalvaro
 * Romain Dorgueil (hartym)
 * cocoiti
