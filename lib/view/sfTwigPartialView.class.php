@@ -32,4 +32,15 @@ class sfTwigPartialView extends sfTwigView
         $this->partialVars = $variables;
         $this->getAttributeHolder()->add($variables);
     }
+    
+    /**
+     * Invokes the parent configure and forces the this view object not to decorate
+     *
+     * @return false
+     */
+    public function configure()
+    {
+        parent::configure();        
+        $this->setDecorator(false);
+    }
 }

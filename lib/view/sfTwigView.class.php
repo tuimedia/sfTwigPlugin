@@ -47,10 +47,14 @@ class sfTwigView extends sfPHPView
         $this->loader = new Twig_Loader_Filesystem(array());
         
         $this->twig = new Twig_Environment($this->loader, array(
-            'auto_reload' => sfConfig::get('sf_debug', false),
             'cache' => sfConfig::get('sf_template_cache_dir'),
             'debug' => sfConfig::get('sf_debug', false),
         )); 
+        
+        if ($this->twig->isDebug()) {
+            $this->twig->setCache(null);
+            $this->twig->setAutoReload(true);
+        }
         
         $this->loadExtensions();       
     }
