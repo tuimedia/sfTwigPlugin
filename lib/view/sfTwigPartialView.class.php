@@ -18,8 +18,10 @@
  */
 class sfTwigPartialView extends sfTwigView
 {
-    protected
-        $partialVars = array();
+    /**
+     * @var array of variables to pass to the partial template
+     */
+    protected $partialVars = array();
     
     /**
      * Method used by symfony to force add the extra variables when rendering a partial
