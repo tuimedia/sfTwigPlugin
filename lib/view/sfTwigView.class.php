@@ -60,6 +60,16 @@ class sfTwigView extends sfPHPView
     }
     
     /**
+     * Returns the Twig_Environment
+     *
+     * @return Twig_Environment
+     */
+    public function getEngine()
+    {
+        return $this->twig;
+    }
+    
+    /**
      * Returns the attributeHolders variables merged with some default ones. Since
      * sfPHPView normally has a $this context we fake it here.
      *

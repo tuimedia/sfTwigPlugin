@@ -15,7 +15,7 @@ About Twig
 
 Install
 -------
-To use this plugin extract the contents into ``plugins/sfTwigPlugin`` and enabled it in Symfony's ``ProjectConfiguration.class.php``.
+To use this plugin extract the contents into ``plugins/sfTwigPlugin`` and enabled it in Symfony's ``ProjectConfiguration.class.php``. After you have cloned the respository. You have to init and update the submodules. Which will download the Twig project into vendor/Twig. A submodule is used because some people may already have Twig installed globally on their machine.
 
 Create ``module.yml`` in ``config/`` or ``apps/frontend/config``. With the following contents.
     all:
