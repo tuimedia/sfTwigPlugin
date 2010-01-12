@@ -112,9 +112,10 @@ class sfTwigView extends sfPHPView
         foreach (sfConfig::get('sf_twig_extensions', array()) as $extension) {
             if (class_exists($extension)) {
                 $this->twig->addExtension(new $extension());
-            } else {
-                throw new InvalidArgumentException(sprintf('Unable to load "%s" as an Twig_Extension into Twig_Environment', $extension));
+                continue;
             }
+            
+            throw new InvalidArgumentException(sprintf('Unable to load "%s" as an Twig_Extension into Twig_Environment', $extension));
         }
     }
     
