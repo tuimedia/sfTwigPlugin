@@ -31,6 +31,8 @@ class sfTwigView extends sfPHPView
      * @var sfApplicationConfiguration
      */
     protected $configuration = null;
+    
+    protected $extension = '.html';
         
     /**
      * Loads the Twig instance and registers the autoloader.
@@ -125,11 +127,7 @@ class sfTwigView extends sfPHPView
             $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s".', $file))));
         }
         
-        if ($this->attributeHolder->get('sf_type') == 'layout') {
-            $this->loader->setPaths(array_filter($this->configuration->getDecoratorDirs(), 'file_exists'));
-        } else {
-            $this->loader->setPaths(array_filter($this->configuration->getTemplateDirs($this->getModuleName()), 'file_exists'));
-        }
+        $this->loader->setPaths((array) realpath(dirname($file)));
         
         return $this->twig->loadTemplate(basename($file))->render($this->getAttributeHolderVariables());
     }

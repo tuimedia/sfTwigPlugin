@@ -42,7 +42,13 @@ class sfTwigPartialView extends sfTwigView
      */
     public function configure()
     {
-        parent::configure();        
+        parent::configure();
         $this->setDecorator(false);
+        
+        $this->setDirectory($this->configuration->getTemplateDir($this->moduleName, $this->getTemplate()));
+        
+        if ($this->moduleName == 'global') {
+            $this->setDirectory($this->configuration->getDecoratorDir($this->getTemplate()));       
+        }
     }
 }
