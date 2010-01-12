@@ -32,6 +32,9 @@ class sfTwigView extends sfPHPView
      */
     protected $configuration = null;
     
+    /**
+     * @var string Extension used by twig templates. which is .html
+     */
     protected $extension = '.html';
         
     /**
@@ -130,17 +133,5 @@ class sfTwigView extends sfPHPView
         $this->loader->setPaths((array) realpath(dirname($file)));
         
         return $this->twig->loadTemplate(basename($file))->render($this->getAttributeHolderVariables());
-    }
-    
-    /**
-     * Returns the extension for the templates, uses HTML so editors
-     * will provided syntax highlighting. For nice syntax highlight get the
-     * syntax for django html.
-     *
-     * @return string
-     */
-    public function getExtension()
-    {
-        return '.html';
     }
 }
