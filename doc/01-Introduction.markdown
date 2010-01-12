@@ -24,6 +24,9 @@ Create ``module.yml`` in ``config/`` or ``apps/frontend/config``. With the follo
         
 Run the task ``./symfony cc`` and your done. All that is left now is to create new templates that uses ``.html`` extension. 
 
+### Extra
+If you plan on using global partials e.g. "global/partial". You must set ``mod_global_partial_view_class`` manually since it wont get populated dynamic. This can be done in ``ProjectConfiguration.class.php`` with ``sfConfig::set('mod_global_partial_view_class', 'sfTwig')`` This will force sfTwigPartialView to be used for the global module.
+
 Usage
 -----
 I recommend everyone to check out the documentation on Twig's website. There it is explained how to create extensions, filters and the general usage of templates. Else read the rest of the documents in this directory.
