@@ -35,6 +35,8 @@ class sfTwigEnvironment extends Twig_Environment
     
     /**
      * Returns sfContext this can be used in filters.
+     *
+     * @return sfContext
      */
     public function getContext()
     {
