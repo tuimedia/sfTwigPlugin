@@ -3,6 +3,7 @@
  * This file is part of the symfony package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2006 Sean Kerr <sean@code-box.org>
+ * (c) 2010-2010 Henrik Bjornskov <henrik@bearwoods.dk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -51,9 +52,10 @@ class sfTwigView extends sfPHPView
         //Empty array becuase it changes based on the rendering context
         $this->loader = new Twig_Loader_Filesystem(array());
         
-        $this->twig = new Twig_Environment($this->loader, array(
+        $this->twig = new sfTwigEnvironment($this->loader, array(
             'cache' => sfConfig::get('sf_template_cache_dir'),
             'debug' => sfConfig::get('sf_debug', false),
+            'sf_context' => $this->context,
         )); 
         
         if ($this->twig->isDebug()) {
