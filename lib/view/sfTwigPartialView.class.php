@@ -51,4 +51,14 @@ class sfTwigPartialView extends sfTwigView
             $this->setDirectory($this->configuration->getDecoratorDir($this->getTemplate()));       
         }
     }
+    
+    /**
+     * Overwrite until caching have been implemented fully into this class.
+     *
+     * @return null
+     */
+    public function getCache()
+    {
+        return null;
+    }
 }

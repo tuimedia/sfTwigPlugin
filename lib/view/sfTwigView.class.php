@@ -98,7 +98,7 @@ class sfTwigView extends sfPHPView
     protected function loadExtensions()
     {
         //Should be replaced with sf_twig_standard_extensions
-        $prefixes = array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping', 'Partial', 'I18n'), sfConfig::get('sf_standard_helpers'));
+        $prefixes = array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping', 'Partial', 'I18N'), sfConfig::get('sf_standard_helpers'));
         
         foreach ($prefixes as $prefix) {
             $class_name = $prefix . '_Twig_Extension';
