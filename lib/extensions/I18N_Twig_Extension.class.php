@@ -1,5 +1,5 @@
 <?php
-class I18n_Twig_Extension extends Twig_Extension
+class I18N_Twig_Extension extends Twig_Extension
 {
   public function getFilters()
   {
