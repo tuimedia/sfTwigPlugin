@@ -84,9 +84,10 @@ class sfTwigView extends sfPHPView
      */
     protected function getAttributeHolderVariables()
     {
-        return sfToolKit::arrayDeepMerge($this->attributeHolder->getAll(), array(
-            'context' => $this->context,
-        ));
+        $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
+        $parameters = $event->getReturnValue();
+        
+        return $parameters;
     }
     
     /**
