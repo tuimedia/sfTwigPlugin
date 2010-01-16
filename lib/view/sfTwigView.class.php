@@ -77,18 +77,6 @@ class sfTwigView extends sfPHPView
     }
     
     /**
-     * Returns the attributeHolders variables merged with some default ones. Since
-     * sfPHPView normally has a $this context we fake it here.
-     *
-     * @return array
-     */
-    protected function getAttributeHolderVariables()
-    {
-        return $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll())
-                    ->getReturnValue();
-    }
-    
-    /**
      * Loads standard extensions for Symfony into the view, the extensions should be replaced
      * with real Twig extensions where tags and filters are determained.
      *
@@ -134,6 +122,8 @@ class sfTwigView extends sfPHPView
         
         $this->loader->setPaths((array) realpath(dirname($file)));
         
-        return $this->twig->loadTemplate(basename($file))->render($this->getAttributeHolderVariables());
+        $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
+        
+        return $this->twig->loadTemplate(basename($file))->render($event->getReturnValue());
     }
 }
