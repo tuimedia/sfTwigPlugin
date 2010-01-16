@@ -84,10 +84,8 @@ class sfTwigView extends sfPHPView
      */
     protected function getAttributeHolderVariables()
     {
-        $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
-        $parameters = $event->getReturnValue();
-        
-        return $parameters;
+        return $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll())
+                    ->getReturnValue();
     }
     
     /**
