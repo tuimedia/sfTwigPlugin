@@ -59,7 +59,6 @@ class sfTwigView extends sfPHPView
         )); 
         
         if ($this->twig->isDebug()) {
-            $this->twig->setCache(null);
             $this->twig->setAutoReload(true);
         }
         
