@@ -12,137 +12,117 @@
 /**
  * A view that uses Twig as the templating engine.
  *
- * Unlike original Henrik's branch, my interest in using twig is to ease the
- * development <-> integration communication by removing duplicate work. I want
- * all templates to be in one place, and only one.
- *
- * Therefore, templates are not anymore in modules, but in %sf_data_dir%/template/module_name/template
- *
- * This may change.
- *
- * TODO
- * - find a way to change template in actions
- *
  * @package    symfony
  * @subpackage sfTwigPlugin
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
- * @author     Romain Dorgueil <romain.dorgueil@symfony-project.com>
  */
 class sfTwigView extends sfPHPView
 {
-  /**
-   * @var Twig_Environment
-   */
-  protected $twig = null;
-
-  /**
-   * @var Twig_Loader_Filesystem
-   */
-  protected $loader = null;
-
-  /**
-   * @var sfApplicationConfiguration
-   */
-  protected $configuration = null;
-
-  /**
-   * @var string Extension used by twig templates. which is .html
-   */
-  protected $extension = '.html';
-
-  /**
-   * Loads the Twig instance and registers the autoloader.
-   *
-   * @return void
-   */
-  public function configure()
-  {
-    // is this the best way ?
-    $this->directory = sfConfig::get('sf_data_dir').'/template/module/'.$this->moduleName;
-    $this->decoratorDirectory = sfConfig::get('sf_data_dir').'/template/application/'.sfConfig::get('sf_app');
-
-    parent::configure();
-
-    $this->configuration = $this->context->getConfiguration();
-
-    // Empty array becuase it changes based on the rendering context
-    $this->loader = new Twig_Loader_Filesystem(array());
-
-    $this->twig = new sfTwigEnvironment($this->loader, array(
-          'cache' => sfConfig::get('sf_template_cache_dir'),
-          'debug' => sfConfig::get('sf_debug', false),
-          'sf_context' => $this->context,
-          ));
-
-    if ($this->twig->isDebug())
+    /**
+     * @var Twig_Environment
+     */
+    protected $twig = null;
+    
+    /**
+     * @var Twig_Loader_Filesystem
+     */
+    protected $loader = null;
+    
+    /**
+     * @var sfApplicationConfiguration
+     */
+    protected $configuration = null;
+    
+    /**
+     * @var string Extension used by twig templates. which is .html
+     */
+    protected $extension = '.html';
+        
+    /**
+     * Loads the Twig instance and registers the autoloader.
+     *
+     * @return void
+     */
+    public function configure()
     {
-      $this->twig->setAutoReload(true);
+        parent::configure();
+        
+        $this->configuration = $this->context->getConfiguration();
+        
+        //Empty array becuase it changes based on the rendering context
+        $this->loader = new Twig_Loader_Filesystem(array());
+        
+        $this->twig = new sfTwigEnvironment($this->loader, array(
+            'cache' => sfConfig::get('sf_template_cache_dir'),
+            'debug' => sfConfig::get('sf_debug', false),
+            'sf_context' => $this->context,
+        )); 
+        
+        if ($this->twig->isDebug()) {
+            $this->twig->setAutoReload(true);
+        }
+        
+        $this->loadExtensions();       
     }
-
-    $this->loadExtensions();
-  }
-
-  /**
-   * Sets the template for this view.
-   *
-   * If the template path is relative, it will be based on the currently
-   * executing module's template sub-directory.
-   *
-   * @param string $template  An absolute or relative filesystem path to a template
-   */
-  public function setTemplate($template)
-  {
-    if (sfToolkit::isPathAbsolute($template))
+    
+    /**
+     * Returns the Twig_Environment
+     *
+     * @return Twig_Environment
+     */
+    public function getEngine()
     {
-      // TODO remove line below
-      $this->directory or $this->directory = dirname($template);
-      $this->template  = basename($template);
+        return $this->twig;
     }
-    else
+    
+    /**
+     * Loads standard extensions for Symfony into the view, the extensions should be replaced
+     * with real Twig extensions where tags and filters are determained.
+     *
+     * @return void
+     */
+    protected function loadExtensions()
     {
-      // TODO remove line below
-      $this->directory or $this->directory = $this->context->getConfiguration()->getTemplateDir($this->moduleName, $template);
-      $this->template = $template;
+        //Should be replaced with sf_twig_standard_extensions
+        $prefixes = array_merge(array('Helper', 'Url', 'Asset', 'Tag', 'Escaping', 'Partial', 'I18N'), sfConfig::get('sf_standard_helpers'));
+        
+        foreach ($prefixes as $prefix) {
+            $class_name = $prefix . '_Twig_Extension';
+            if (class_exists($class_name)) {
+                $this->twig->addExtension(new $class_name());
+            }
+        }
+        
+        //for now the extensions needs the original helpers so lets load thoose.
+        $this->configuration->loadHelpers($prefixes);
+        
+        //Makes it possible to load custom twig extensions.
+        foreach (sfConfig::get('sf_twig_extensions', array()) as $extension) {
+            if (class_exists($extension)) {
+                $this->twig->addExtension(new $extension());
+                continue;
+            }
+            
+            throw new InvalidArgumentException(sprintf('Unable to load "%s" as an Twig_Extension into Twig_Environment', $extension));
+        }
     }
-  }
-
-  /**
-   * Returns the Twig_Environment
-   *
-   * @return Twig_Environment
-   */
-  public function getEngine()
-  {
-    return $this->twig;
-  }
-
-  /**
-   * Loads standard extensions for Symfony into the view, the extensions should be replaced
-   * with real Twig extensions where tags and filters are determained.
-   *
-   * @return void
-   */
-  protected function loadExtensions()
-  {
-    $this->twig->addExtension(new sfTwigExtensionAsset());
-  }
-
-  /**
-   * This renders a file based on the $file and sf_type
-   *
-   * @param string $file the fullpath to the template file
-   * @return string
-   */
-  protected function renderFile($file)
-  {
-    if (sfConfig::get('sf_logging_enabled', false)) {
-      $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s".', $file))));
+    
+    /**
+     * This renders a file based on the $file and sf_type
+     *
+     * @param string $file the fullpath to the template file
+     * @return string
+     */
+    protected function renderFile($file)
+    {
+        if (sfConfig::get('sf_logging_enabled', false)) {
+            $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s".', $file))));
+        }
+        
+        $this->loader->setPaths((array) realpath(dirname($file)));
+        
+        $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
+        
+        return $this->twig->loadTemplate(basename($file))->render($event->getReturnValue());
     }
-
-    $this->loader->setPaths((array) realpath(dirname($file)));
-
-    $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
-
-    return $this->twig->loadTemplate(basename($file))->render($event->getReturnValue());
-  }
 }
