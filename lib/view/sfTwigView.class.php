@@ -116,7 +116,7 @@ class sfTwigView extends sfPHPView
     protected function renderFile($file)
     {
         if (sfConfig::get('sf_logging_enabled', false)) {
-            $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s".', $file))));
+            $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s"', $file))));
         }
         
         $this->loader->setPaths((array) realpath(dirname($file)));
