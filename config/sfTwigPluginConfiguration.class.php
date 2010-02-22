@@ -10,7 +10,7 @@
  */
 class sfTwigPluginConfiguration extends sfPluginConfiguration
 {
-    const VERSION = '1.0.0-DEV';
+    const VERSION = '0.1.4-DEV';
     
     /**
      * @see sfPluginConfiguration
