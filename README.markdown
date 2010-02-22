@@ -1,3 +1,4 @@
 sfTwigPlugin
 ============
-Read the documents in the ``doc`` directory.
+
+Please read the documentation in the `doc/` directory.
