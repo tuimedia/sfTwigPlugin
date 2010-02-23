@@ -1,5 +1,0 @@
-autoload:
-  Twig:
-    name:       Twig classes
-    ext:        .php
-    path:       <?php echo realpath(dirname(__FILE__) . '/../lib') . "\n"; ?>
