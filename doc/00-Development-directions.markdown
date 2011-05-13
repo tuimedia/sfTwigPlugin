@@ -7,26 +7,26 @@ subject to evolution.
 Helpers implementation
 ----------------------
 
-We need to implement all helpers that are available in symfony 1.4, that split
-in the three categories:
+We need to implement all helpers that are available in symfony 1.4, that are
+in these three categories:
 
  - Helpers that output text directly, without acting like "filtering" some
    other text.
 
-   Implementation choice: {{ generate_lorem_ipsum(42) }} (still to find how to
+   Implementation choice: {{ generate_lorem_ipsum(42) }} (still need to find how to
    do this, and if it is actually possible.)
 
  - Helpers that output text as a result of filtering other text.
 
    Implementation choice: {{ 'text' | cypher }} (filter)
 
- - Helpers that does not output anything.
+ - Helpers that do not output anything.
  
    Implementation choice: {% use_javascript "something" %} (tag)
 
-Some helpers are maybe obsolete because of other twig functionnalities, but
-there is no reason to forbid people using them if they want, so we will
-implement all.
+Some helpers may be obsolete because of other Twig functionnalities, but
+there is no reason to forbid people from using them if they want to, so we will
+implement them all.
 
 Template decoration can be considered obsolete, but it can be handy in some
 cases, and it's a symfony feature. It's not expensive to keep it, using
