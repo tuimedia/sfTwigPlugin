@@ -32,6 +32,14 @@ contents:
       view_class: sfTwig
       partial_view_class: sfTwig
 
+You should disable the default layout of `view.yml` in `config/` or `apps/frontend/config/`:
+
+    default:
+      has_layout:     false
+      layout:         null
+
+It can also be enabled only at the module level, by putting the files into `apps/application/yourmodule/config`. This is also useful to revert to `sfPHPView` (the default view class) for a particular module.
+
 Run the task `./symfony cache:clear` and you're done. All that is left now is
 to create new templates that use the `.html` extension.
 
