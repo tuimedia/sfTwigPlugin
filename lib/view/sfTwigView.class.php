@@ -58,7 +58,8 @@ class sfTwigView extends sfPHPView
 
     if ($this->twig->isDebug())
     {
-      $this->twig->setAutoReload(true);
+      $this->twig->enableAutoReload();
+      $this->twig->setCache(null);
     }
 
     $this->loadExtensions();
