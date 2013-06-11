@@ -36,7 +36,7 @@ class sfTwigView extends sfPHPView
   /**
    * @var string Extension used by twig templates. which is .html
    */
-  protected $extension = '.html';
+  protected $extension = '.twig';
 
   /**
    * Loads the Twig instance and registers the autoloader.
