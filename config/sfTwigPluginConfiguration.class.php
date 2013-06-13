@@ -16,6 +16,7 @@
  * @subpackage config
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
  * @author     Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author     Yurii Berest <djua.com@gmail.com>
  */
 class sfTwigPluginConfiguration extends sfPluginConfiguration
 {
@@ -30,5 +31,17 @@ class sfTwigPluginConfiguration extends sfPluginConfiguration
         require_once sfConfig::get('sf_twig_lib_dir', $defaultDir) . '/Twig/Autoloader.php';
 
         Twig_Autoloader::register();
+
+        $this->dispatcher->connect('context.load_factories', array($this, 'listenToLoadFactoriesEvent'));
     }
+
+    /**
+     * @param sfEvent $event
+     */
+    public function listenToLoadFactoriesEvent(sfEvent $event)
+    {
+        /** @var sfContext $sfContext */
+        sfTwigRenderEngine::addEngineToContext($event->getSubject());
+    }
+
 }

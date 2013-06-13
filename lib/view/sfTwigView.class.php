@@ -15,54 +15,15 @@
  * @package    sfTwigPlugin
  * @subpackage view
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yurii Berest <djua.com@gmail.com>
  */
 class sfTwigView extends sfPHPView
 {
-    /**
-     * @var Twig_Environment
-     */
-    protected $twig = null;
-
-    /**
-     * @var Twig_Loader_Filesystem
-     */
-    protected $loader = null;
-
-    /**
-     * @var sfApplicationConfiguration
-     */
-    protected $configuration = null;
 
     /**
      * @var string Extension used by twig templates. which is .html
      */
     protected $extension = '.twig';
-
-    /**
-     * Loads the Twig instance and registers the autoloader.
-     */
-    public function configure()
-    {
-        parent::configure();
-
-        $this->configuration = $this->context->getConfiguration();
-
-        // empty array becuase it changes based on the rendering context
-        $this->loader = new Twig_Loader_Filesystem(array());
-
-        $this->twig = new sfTwigEnvironment($this->loader, array(
-            'cache' => sfConfig::get('sf_template_cache_dir'),
-            'debug' => sfConfig::get('sf_debug', false),
-            'sf_context' => $this->context,
-        ));
-
-        if ($this->twig->isDebug()) {
-            $this->twig->enableAutoReload();
-            $this->twig->setCache(null);
-        }
-
-        $this->loadExtensions();
-    }
 
     /**
      * Returns the Twig_Environment
@@ -71,40 +32,21 @@ class sfTwigView extends sfPHPView
      */
     public function getEngine()
     {
-        return $this->twig;
+        return sfTwigRenderEngine::getInstanceFromContext($this->context)->getTwig();
     }
 
-    /**
-     * Loads standard extensions for Symfony into the view.
-     */
-    protected function loadExtensions()
+    protected function getNamespaceByTplPath($tplPath)
     {
-        // should be replaced with sf_twig_standard_extensions
-        $prefixes = array_merge(
-            array('Helper', 'Url', 'Asset', 'Tag', 'Escaping', 'Partial', 'I18N'),
-            sfConfig::get('sf_standard_helpers')
-        );
+        $tplPath = realpath($tplPath);
 
-        foreach ($prefixes as $prefix) {
-            $className = $prefix . '_Twig_Extension';
-            if (class_exists($className)) {
-                $this->twig->addExtension(new $className());
-            }
-        }
-
-        // for now the extensions needs the original helpers so lets load thoose.
-        $this->configuration->loadHelpers($prefixes);
-
-        // makes it possible to load custom twig extensions.
-        foreach (sfConfig::get('sf_twig_extensions', array()) as $extension) {
-            if (!class_exists($extension)) {
-                throw new InvalidArgumentException(sprintf(
-                    'Unable to load "%s" as an Twig_Extension into Twig_Environment',
-                    $extension
-                ));
-            }
-
-            $this->twig->addExtension(new $extension());
+        $moduleDir = sfConfig::get('sf_app_module_dir');
+        $str = str_replace($moduleDir, '', $tplPath);
+        $str = ltrim($str, '/\\');
+        $data = explode('/', $str);
+        if (count($data) === 3) {
+            return $data[0];
+        } else {
+            return 'root';
         }
     }
 
@@ -121,21 +63,11 @@ class sfTwigView extends sfPHPView
             $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s"', $file))));
         }
 
-        $paths = array();
-        if (sfConfig::get('sf_twig_search_global_dir')) {
-            $paths[] = sfConfig::get('sf_app_template_dir');
-        }
-        if ($moduleDir = realpath(dirname($file))) {
-            $paths[] = $moduleDir;
-        }
-        $this->loader->setPaths($paths);
+        $namespace = $this->getNamespaceByTplPath($file);
+        $tplName = '@' . $namespace . '/' . basename($file);
 
+        $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
 
-        $event = $this->dispatcher->filter(
-            new sfEvent($this, 'template.filter_parameters'),
-            $this->attributeHolder->getAll()
-        );
-
-        return $this->twig->loadTemplate(basename($file))->render($event->getReturnValue());
+        return $this->getEngine()->loadTemplate($tplName)->render($event->getReturnValue());
     }
 }

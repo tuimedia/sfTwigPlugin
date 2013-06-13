@@ -18,6 +18,7 @@
  * @package    sfTwigPlugin
  * @subpackage environment
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yurii Berest <djua.com@gmail.com>
  */
 class sfTwigEnvironment extends Twig_Environment
 {
@@ -33,8 +34,11 @@ class sfTwigEnvironment extends Twig_Environment
     {
         parent::__construct($loader, $options);
 
-        $this->context = isset($options['sf_context']) && $options['sf_context'] instanceof sfContext ? $options['sf_context'] : sfContext::getInstance(
-        );
+        if (isset($options['sf_context']) && $options['sf_context'] instanceof sfContext) {
+            $this->context = $options['sf_context'];
+        } else {
+            $this->context = sfContext::getInstance();
+        }
     }
 
     /**
@@ -44,6 +48,9 @@ class sfTwigEnvironment extends Twig_Environment
      */
     public function getContext()
     {
+        // throw new \InvalidArgumentException('asd');
+
         return $this->context;
     }
+
 }
