@@ -15,44 +15,44 @@
  * @package    sfTwigPlugin
  * @subpackage view
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yurii Berest <djua.com@gmail.com>
  */
-class sfTwigPartialView extends sfTwigView
+class sfTwigPartialView extends sfPartialView
 {
-    /**
-     * @var array of variables to pass to the partial template
-     */
-    protected $partialVars = array();
 
     /**
-     * Method used by symfony to force add the extra variables when rendering a partial
+     * @var string Extension used by twig templates. which is .html
+     */
+    protected $extension = '.twig';
+
+    /**
+     * Returns the Twig_Environment
      *
-     * @param array $variables
+     * @return Twig_Environment
      */
-    public function setPartialVars(array $variables)
+    public function getEngine()
     {
-        $this->partialVars = $variables;
-        $this->getAttributeHolder()->add($variables);
+        return sfTwigRenderEngine::getInstanceFromContext($this->context)->getTwig();
     }
 
     /**
-     * Invokes the parent configure and forces the this view object not to decorate.
+     * This renders a file based on the $file and sf_type.
+     *
+     * @param string $file the fullpath to the template file
+     *
+     * @return string
      */
-    public function configure()
+    protected function renderFile($file)
     {
-        parent::configure();
-
-        $this->setDecorator(false);
-        $this->setDirectory($this->configuration->getTemplateDir($this->moduleName, $this->getTemplate()));
-
-        if ('global' == $this->moduleName) {
-            $this->setDirectory($this->configuration->getDecoratorDir($this->getTemplate()));
+        if (sfConfig::get('sf_logging_enabled', false)) {
+            $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s"', $file))));
         }
+
+        $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
+
+        $tplName = sfTwigLoaderFs::getTplNameByFilePath($file);
+
+        return $this->getEngine()->loadTemplate($tplName)->render($event->getReturnValue());
     }
 
-    /**
-     * Overwrite until caching have been implemented fully into this class.
-     */
-    public function getCache()
-    {
-    }
 }
