@@ -41,7 +41,7 @@ class sfTwigLoaderFs implements Twig_LoaderInterface
             throw new Twig_Error_Loader('A template name cannot contain NUL bytes.');
         }
 
-        if (preg_match('/^@(?P<namespace>[a-z\_\-]+)(?P<path>(?:\/[a-z\_\-\+0-9]+)+\.[a-z]+)$/i', $name, $m) === 0) {
+        if (preg_match('/^@([a-z\_\-]+)((?:\/[a-z\_\-\+0-9]+)+\.[a-z]+)$/i', $name, $m) === 0) {
             throw new Twig_Error_Loader(sprintf('Malformed template name "%s" (expecting "@namespace/template_name").', $name));
         }
 
