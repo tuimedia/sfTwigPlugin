@@ -35,21 +35,6 @@ class sfTwigView extends sfPHPView
         return sfTwigRenderEngine::getInstanceFromContext($this->context)->getTwig();
     }
 
-    protected function getNamespaceByTplPath($tplPath)
-    {
-        $tplPath = realpath($tplPath);
-
-        $moduleDir = sfConfig::get('sf_app_module_dir');
-        $str = str_replace($moduleDir, '', $tplPath);
-        $str = ltrim($str, '/\\');
-        $data = explode('/', $str);
-        if (count($data) === 3) {
-            return $data[0];
-        } else {
-            return 'root';
-        }
-    }
-
     /**
      * This renders a file based on the $file and sf_type.
      *
@@ -63,10 +48,9 @@ class sfTwigView extends sfPHPView
             $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s"', $file))));
         }
 
-        $namespace = $this->getNamespaceByTplPath($file);
-        $tplName = '@' . $namespace . '/' . basename($file);
-
         $event = $this->dispatcher->filter(new sfEvent($this, 'template.filter_parameters'), $this->attributeHolder->getAll());
+
+        $tplName = sfTwigLoaderFs::getTplNameByFilePath($file);
 
         return $this->getEngine()->loadTemplate($tplName)->render($event->getReturnValue());
     }

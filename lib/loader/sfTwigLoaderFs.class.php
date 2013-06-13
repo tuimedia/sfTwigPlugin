@@ -49,6 +49,14 @@ class sfTwigLoaderFs implements Twig_LoaderInterface
         $tplPath =ltrim($m[2], '/');
     }
 
+    /**
+     * получение полного пути к файлу по имени шаблона
+     *
+     * @param string $name имя шаблона
+     *
+     * @return string
+     * @throws Twig_Error_Loader
+     */
     protected function findTemplate($name)
     {
         $name = $this->normalizeName($name);
@@ -94,6 +102,29 @@ class sfTwigLoaderFs implements Twig_LoaderInterface
     public function isFresh($name, $time)
     {
         return filemtime($this->findTemplate($name)) <= $time;
+    }
+
+    /**
+     * получение имени шаблона по полному пути к файлу
+     *
+     * @param string $filePath
+     *
+     * @return string
+     */
+    public static function getTplNameByFilePath($filePath)
+    {
+        $filePath = realpath($filePath);
+
+        $str = str_replace(sfConfig::get('sf_app_module_dir'), '', $filePath);
+        $str = ltrim($str, '/\\');
+        $data = explode('/', $str);
+        if (count($data) === 3) {
+            $namespace = $data[0];
+        } else {
+            $namespace = 'root';
+        }
+
+        return '@' . $namespace . '/' . basename($filePath);
     }
 
 }
