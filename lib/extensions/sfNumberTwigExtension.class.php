@@ -10,23 +10,31 @@
  */
 
 /**
- * Helper helpers.
+ * Number helpers.
  *
  * @package    sfTwigPlugin
  * @subpackage extension
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yuriy Berest <djua.com@gmail.com>
  */
-class Helper_Twig_Extension extends Twig_Extension
+class sfNumberTwigExtension extends Twig_Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getFilters()
     {
         return array(
-            'use_helper' => new Twig_Filter_Function('use_helper'),
+            'format_number' => new Twig_Filter_Function('format_number'),
+            'format_currency' => new Twig_Filter_Function('format_currency'),
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
-        return 'helper';
+        return 'number';
     }
 }

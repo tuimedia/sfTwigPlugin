@@ -15,9 +15,13 @@
  * @package    sfTwigPlugin
  * @subpackage extension
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yuriy Berest <djua.com@gmail.com>
  */
-class Partial_Twig_Extension extends Twig_Extension
+class sfPartialTwigExtension extends Twig_Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions()
     {
         $options = array('is_safe' => array('html'));
@@ -40,6 +44,9 @@ class Partial_Twig_Extension extends Twig_Extension
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'partial';

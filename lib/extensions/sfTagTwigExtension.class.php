@@ -15,9 +15,13 @@
  * @package    sfTwigPlugin
  * @subpackage extension
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yuriy Berest <djua.com@gmail.com>
  */
-class Tag_Twig_Extension extends Twig_Extension
+class sfTagTwigExtension extends Twig_Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions()
     {
         $options = array('is_safe' => array('html'));
@@ -34,6 +38,9 @@ class Tag_Twig_Extension extends Twig_Extension
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'tag';

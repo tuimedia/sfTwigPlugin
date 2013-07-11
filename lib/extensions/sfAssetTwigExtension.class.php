@@ -15,9 +15,14 @@
  * @package    sfTwigPlugin
  * @subpackage extension
  * @author     Henrik Bjornskov <henrik@bearwoods.dk>
+ * @author     Yuriy Berest <djua.com@gmail.com>
  */
-class Asset_Twig_Extension extends Twig_Extension
+class sfAssetTwigExtension extends Twig_Extension
 {
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions()
     {
         return array(
@@ -50,6 +55,9 @@ class Asset_Twig_Extension extends Twig_Extension
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'asset';
