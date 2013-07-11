@@ -53,4 +53,40 @@ class sfTwigEnvironment extends Twig_Environment
         return $this->context;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function writeCacheFile($file, $content)
+    {
+        $dir = dirname($file);
+        $currentUmask = umask(0000);
+
+        if (!is_dir($dir)) {
+            if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new RuntimeException(sprintf("Unable to create the cache directory (%s).", $dir));
+            }
+        } elseif (!is_writable($dir)) {
+            throw new RuntimeException(sprintf("Unable to write in the cache directory (%s).", $dir));
+        }
+
+        $success = false;
+        $tmpFile = tempnam(dirname($file), basename($file));
+        if (false !== @file_put_contents($tmpFile, $content)) {
+            if (false === ($success = @rename($tmpFile, $file))) {
+                $success = copy($tmpFile, $file);
+                $success = unlink($tmpFile) && $success;
+            }
+        }
+
+        if ($success) {
+            chmod($file, 0666);
+        }
+
+        umask($currentUmask);
+
+        if (!$success) {
+            throw new RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+        }
+    }
+
 }
