@@ -44,6 +44,8 @@ class sfTwigPartialView extends sfPartialView
      */
     protected function renderFile($file)
     {
+        $this->loadCoreAndStandardHelpers();
+
         if (sfConfig::get('sf_logging_enabled', false)) {
             $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Render "%s"', $file))));
         }

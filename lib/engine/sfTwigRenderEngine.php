@@ -78,41 +78,25 @@ class sfTwigRenderEngine
         return $twig;
     }
 
-
     /**
-     * Loads standard extensions for Symfony into the view.
+     * Загрузка необходимых расширений twig
+     *
+     * @return $this
      */
     protected function loadExtensions()
     {
-        // should be replaced with sf_twig_standard_extensions
-        $prefixes = array_merge(
-            array('Helper', 'Url', 'Asset', 'Tag', 'Escaping', 'Partial', 'I18N'),
-            sfConfig::get('sf_standard_helpers')
-        );
+        $extensions = sfConfig::get('sf_twig_extensions', array());
 
-        foreach ($prefixes as $prefix) {
-            $className = $prefix . '_Twig_Extension';
-            if (class_exists($className)) {
-                $this->twig->addExtension(new $className());
-            }
-        }
-
-        // for now the extensions needs the original helpers so lets load thoose.
-        $this->sfContext->getConfiguration()->loadHelpers($prefixes);
-
-        // makes it possible to load custom twig extensions.
-        foreach (sfConfig::get('sf_twig_extensions', array()) as $extension) {
-            if (!class_exists($extension)) {
-                throw new InvalidArgumentException(sprintf(
-                    'Unable to load "%s" as an Twig_Extension into Twig_Environment',
-                    $extension
-                ));
-            }
-
+        foreach ($extensions as $extension) {
             $this->twig->addExtension(new $extension());
         }
+
+        return $this;
     }
 
+    /**
+     * @return sfTwigEnvironment
+     */
     public function getTwig()
     {
         if ($this->twig === null) {
