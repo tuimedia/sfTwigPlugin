@@ -85,7 +85,7 @@ class sfTwigRenderEngine
      */
     protected function loadExtensions()
     {
-        $extensions = sfConfig::get('sf_twig_extensions', array());
+        $extensions = sfConfig::get('app_sfTwigPlugin_sf_twig_extensions', array());
 
         foreach ($extensions as $extension) {
             $this->twig->addExtension(new $extension());
